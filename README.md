@@ -4,9 +4,9 @@ This model predicts primary biodegradation (DT50) using a supervised model tree 
 
 Further details of this model can be found in the Open access paper: 
 
-"Predicting Primary Biodegradation of Petroleum Hydrocarbons in Aquatic Systems: Integrating System and Molecular Structure Parameters using a Novel Machine-Learning Framework"
+_"Predicting Primary Biodegradation of Petroleum Hydrocarbons in Aquatic Systems: Integrating System and Molecular Structure Parameters using a Novel Machine-Learning Framework"_
 
-Available in: https://setac.onlinelibrary.wiley.com/doi/10.1002/etc.5328
+**Available in: https://setac.onlinelibrary.wiley.com/doi/10.1002/etc.5328**
 
 The scripts require the installation of R and RStudio with the next libraries:
 
@@ -15,9 +15,11 @@ The scripts require the installation of R and RStudio with the next libraries:
         library(Cubist)
         library(caret)
         library(stringi)
-        library(stringr)
+        library(tidyverse)
         library(scales)
-        library(RColorBrewer)
+        library(dplyr)
+        library(plyr)
+        library(RcolorBrewer) 
 
 The fingerprints (Toxprints) required for the model must come from the Chemotyper available here: 
 https://chemotyper.org/
