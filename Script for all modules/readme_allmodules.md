@@ -22,5 +22,11 @@ library("tidyverse")
 library("plyr")  
 library("RCurl")
 
+Once the code is running 4 pop up windows should appear and user must load the datasets in this order:
 
+1) toxprints and SMILES (.tsv)
+2) Sediment_HCBioSIM_Dataset.csv (from the folder "Training sets")
+3) Soil_HCBioSIM_Dataset.csv
+4) Water_HCBioSIM_Dataset.csv
+ 
 
