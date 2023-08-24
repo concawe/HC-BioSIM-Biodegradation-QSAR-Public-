@@ -1,5 +1,5 @@
 # Load packages  -----------------------------------------------------
-HCBioSIM_SOIL<-c("rpart", "rpart.plot", "Cubist", "caret", "stringi", "stringr", "scales", 
+HCBioSIM_SOIL<-c("rpart", "rpart.plot", "Cubist", "caret", "stringi", "scales", 
                  "dplyr", "ggplot2", "tidyverse", "plyr")
 lapply(HCBioSIM_SOIL, require, character.only=TRUE)
 
