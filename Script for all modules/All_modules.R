@@ -89,7 +89,7 @@ Fings3xFW<- Fings3 %>%
   rename_at('M_SMILES', ~'Smiles') %>% rowid_to_column(("ChemID"))
 
 # Sediment module -----------------------------------------------------
-sedimentD<-read.csv("https://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@raw.githubusercontent.com/GusGroLimon/HCBioSIM-app/main/TrainingSetSediment.csv")
+sedimentD<-read.csv("https://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@raw.githubusercontent.com/GusGroLimon/HCBioSIM-app/main/TrainingSetSediment.csv")
 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(sedimentD$Data.ID.No)){
@@ -137,7 +137,7 @@ for (i in 1:length(newSed$Data.ID.No)){
 SedResults<-data.frame(LogDT50_Sediment = signif(predict(m4, newSed), 7))  
 
 # Soil module -------------------------------------------------------------
-soilD = read.csv("https://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@raw.githubusercontent.com/GusGroLimon/HCBioSIM-app/main/TrainingSetSoil.csv") #load trainset 
+soilD = read.csv("https://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@raw.githubusercontent.com/GusGroLimon/HCBioSIM-app/main/TrainingSetSoil.csv") #load trainset 
 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(soilD$Data.ID.No)){
@@ -187,7 +187,7 @@ SoilResults<-data.frame(LogDT50_Soil = signif(predict(m3, newSoil), 7))
 # Water module ----------------------------------------------
 #Load trainset SW'n'FW
 #Waterdc = read.csv(file.choose())
-Waterdc = read.csv("https://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@raw.githubusercontent.com/GusGroLimon/HCBioSIM-app/main/TrainingSetWater_Seawater.csv")
+Waterdc = read.csv("https://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@raw.githubusercontent.com/GusGroLimon/HCBioSIM-app/main/TrainingSetWater_Seawater.csv")
 
 #Set identical seed to previous models and split dataset for training and validation
 set.seed(34353637)
