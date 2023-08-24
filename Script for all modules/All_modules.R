@@ -1,5 +1,3 @@
-source("All_modules.R")
-
 # Load packages  -----------------------------------------------------
 HCBioSIM_SOIL<-c("rpart", "rpart.plot", "Cubist", "caret", "stringi", "stringr", "scales", 
                  "dplyr", "ggplot2", "tidyverse", "plyr")
@@ -10,7 +8,6 @@ d1<-read.csv(file.choose(), header = T, sep ="\t")
 d1<-as_tibble(d1)
 
 # Trimming toxprints ------------------------------------------------------
-
 #Triming for Sediment 
 Fings<-d1 %>% 
   select ("M_SMILES","bond.C.N_nitrile_generic",	"bond.C.N_nitrile",	"bond.CN_amine_aliphatic_generic",	"bond.CS_sulfide_dialkyl",	
@@ -89,7 +86,7 @@ Fings3xFW<- Fings3 %>%
   rename_at('M_SMILES', ~'Smiles') %>% rowid_to_column(("ChemID"))
 
 # Sediment module -----------------------------------------------------
-sedimentD<-read.csv(file.choose())
+sedimentD<-read.csv(file.choose(), fileEncoding="latin1")
 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(sedimentD$Data.ID.No)){
@@ -118,7 +115,7 @@ all_P4 = predict(m4, sedimentD)
 train_P4 = predict(m4, train)
 
 #arrange data 
-newSed<-rbind.fill(sedimentD, newSed) #this merges table with default values for FW 
+newSed<-rbind.fill(sedimentD, newSed) #this merges table with default values  
 newSed<-newSed[1033:nrow(newSed),]
 
 #Make new prediction 
@@ -137,7 +134,7 @@ for (i in 1:length(newSed$Data.ID.No)){
 SedResults<-data.frame(LogDT50_Sediment = signif(predict(m4, newSed), 7))  
 
 # Soil module -------------------------------------------------------------
-soilD = read.csv(file.choose())
+soilD = read.csv(file.choose(), fileEncoding="latin1")
 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(soilD$Data.ID.No)){
@@ -167,7 +164,7 @@ train_P3 = predict(m3, train)
 
 #To make a new prediction 
 #arrange data 
-newSoil<-rbind.fill(soilD, newSoil) #this merges table with default values for FW 
+newSoil<-rbind.fill(soilD, newSoil) #this merges table with default values 
 newSoil<-newSoil[838:nrow(newSoil),]
 
 #Trimming redundant n-alkyl fragments C3 - C18
@@ -185,8 +182,8 @@ for (i in 1:length(newSoil$Data.ID.No)){
 SoilResults<-data.frame(LogDT50_Soil = signif(predict(m3, newSoil), 7))  
 
 # Water module ----------------------------------------------
-#Load trainset SW'n'FW
-Waterdc = read.csv(file.choose())
+#Load trainset SW & FW
+Waterdc = read.csv(file.choose(), fileEncoding="latin1")
 
 #Set identical seed to previous models and split dataset for training and validation
 set.seed(34353637)
