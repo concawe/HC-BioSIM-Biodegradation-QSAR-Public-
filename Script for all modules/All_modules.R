@@ -65,24 +65,24 @@ Fings3<-d1 %>%
          ring.fused_PAH_fluorene,	ring.fused_PAH_phenanthrene,	ring.fused_PAH_pyrene)
 
 #sediment parameters
-newSed<-Fings %>% 
-  mutate(StudyT = 13, logfoc = 0.519827994, logWSratio = 0.563481085, log_Tdose = 2.267172,log_Dose = 0.698970004, 
+newSed<-Fings %>%   
+  mutate(StudyT = 20, logfoc = 1.041392685, logWSratio = 0.544, log_Tdose = 1.301029996,log_Dose = 4.301029996, 
          Disp = "No", Innoculum = "Brackish") %>% 
-  rename_at('M_SMILES', ~'SMILES') %>% rowid_to_column(("Data.ID.No"))
+  rename_at('M_SMILES', ~'Smiles') %>% rowid_to_column(("Data.ID.No"))
 
 #soil parameters 
 newSoil<-Fings2 %>% 
-  mutate(StudyT = 10, logfoc = 0.394451681, logDose = 2, logTdose = 4.301029996, Dispersant = "No") %>% 
-  rename_at('M_SMILES', ~'SMILES')%>% rowid_to_column(("Data.ID.No"))
+  mutate(StudyT = 4, logfoc = 0.551449998, logDose =2.301029996, logTdose =  0.602059991, Dispersant = "No") %>% 
+  rename_at('M_SMILES', ~'Smiles')%>% rowid_to_column(("Data.ID.No"))
 
 # SW parameters 
 Fings3xSW<- Fings3 %>% 
-  mutate(Viscosity = 1.023, C_disp = 0, Concentration = 0.1, Temperature = 8, FW = 0, SW = 1, AS = 0) %>%
+  mutate(Viscosity = 1.023, C_disp = 0, Concentration = 2.5, Temperature = 5, FW = 0, SW = 1, AS = 0) %>%
   rename_at('M_SMILES', ~'Smiles') %>% rowid_to_column(("ChemID"))
 
 # FW parameters 
 Fings3xFW<- Fings3 %>% 
-  mutate(Viscosity = 1.023, C_disp = 0, Concentration = 0.1, Temperature = 20, FW = 1, SW = 0, AS = 0) %>%
+  mutate(Viscosity = 1.023, C_disp = 0, Concentration = 0.1, Temperature = 21, FW = 1, SW = 0, AS = 0) %>%
   rename_at('M_SMILES', ~'Smiles') %>% rowid_to_column(("ChemID"))
 
 # Sediment module -----------------------------------------------------
