@@ -163,7 +163,7 @@ m3_7Soil = cubist(x = trainSoil[,c(9, 10, 13, seq(14, 60,1))], y=trainSoil$logDT
 #To make a new prediction 
 #arrange data 
 newSoil<-rbind.fill(soilD, newSoil) #this merges table with default values for FW 
-newSoil<-newSoil[838:nrow(newSoil),]
+newSoil<-newSoil[947:nrow(newSoil),]
 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(newSoil$Data.ID.No)){
