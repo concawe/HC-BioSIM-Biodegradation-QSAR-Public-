@@ -1,14 +1,14 @@
-# Load packages  -----------------------------------------------------
-HCBioSIM_SOIL<-c("rpart", "rpart.plot", "Cubist", "caret", "stringi", "scales", 
-                 "dplyr", "ggplot2", "tidyverse", "plyr")
+#1 Load packages  -----------------------------------------------------
+HCBioSIM_SOIL<-c("rpart", "rpart.plot", "Cubist", "caret", "stringi", "plyr", "tidyverse")
 lapply(HCBioSIM_SOIL, require, character.only=TRUE)
 
-# Getting fingerprints from tsv (Chemotyper)----------------------------------------------------
+#2 Getting fingerprints from tsv (Chemotyper)----------------------------------------------------
 d1<-read.csv(file.choose(), header = T, sep ="\t")
 d1<-as_tibble(d1)
 
-# Trimming toxprints ------------------------------------------------------
-#Triming for Sediment 
+#3 Trimming toxprints ------------------------------------------------------
+
+#Trimming for Sediment 
 Fings<-d1 %>% 
   select ("M_SMILES","bond.C.N_nitrile_generic",	"bond.C.N_nitrile",	"bond.CN_amine_aliphatic_generic",	"bond.CS_sulfide_dialkyl",	
           "bond.CS_sulfide",	"chain.alkaneBranch_isopropyl_C3",	"chain.alkaneBranch_isohexyl_pentyl_3.methyl",	
@@ -30,7 +30,7 @@ Fings<-d1 %>%
           "ring.hetero_.6_6._N_isoquinoline",	"ring.hetero_.6_6._N_quinoline",	"ring.hetero_.6_6._N_quinoxaline",	"ring.hetero_.6_6._Z_generic",
           "ring.hetero_.6_6_6._N_acridine")
 
-#triming for Soil
+#Trimming for Soil
 Fings2<-d1 %>% 
   select (M_SMILES,chain.alkaneBranch_isopropyl_C3, chain.alkaneBranch_t.butyl_C4,	chain.alkaneBranch_neopentyl_C5,	
           chain.alkaneBranch_isohexyl_pentyl_3.methyl,	chain.alkaneBranch_isooctyl_heptyl_3.methyl,	
@@ -48,7 +48,7 @@ Fings2<-d1 %>%
           ring.hetero_.5._Z_1.Z,	ring.hetero_.5_6._O_benzofuran,	ring.hetero_.5_6._Z_generic,	ring.hetero_.6_5_6._O_benzofuran_dibenzo)
 
 
-# freshwater/marine predictions
+# Trimming for freshwater/marine 
 Fings3<-d1 %>%
   select(M_SMILES, chain.alkaneBranch_isopropyl_C3,	chain.alkaneBranch_t.butyl_C4,	chain.alkaneBranch_neopentyl_C5,	
          chain.alkaneBranch_isohexyl_pentyl_3.methyl,	chain.alkaneBranch_isooctyl_heptyl_3.methyl,	
@@ -64,16 +64,17 @@ Fings3<-d1 %>%
          ring.fused_PAH_acenaphthylene,	ring.fused_PAH_anthracene,	ring.fused_PAH_benz.a.anthracene,	ring.fused_PAH_benzophenanthrene,	
          ring.fused_PAH_fluorene,	ring.fused_PAH_phenanthrene,	ring.fused_PAH_pyrene)
 
-#sediment parameters
-newSed<-Fings %>%   
-  mutate(StudyT = 20, logfoc = 1.041392685, logWSratio = 0.544, log_Tdose = 1.301029996,log_Dose = 4.301029996, 
-         Disp = "No", Innoculum = "Brackish") %>% 
-  rename_at('M_SMILES', ~'Smiles') %>% rowid_to_column(("Data.ID.No"))
+#These default values have been taken from the QMRF FOR Hydrocarbon Biodegradation System-Integrated Model (HC-BioSIM) in Davis et al 2022-2024
+#Sediment parameters 
+newSed<-Fings %>% 
+  mutate(StudyT = 4, logfoc = 0.551450, logWSratio = 0.361728, log_Tdose = 2.30103,log_Dose = 0.69897, 
+         Disp = "No", Innoculum = "Marine") %>% 
+  rename_at('M_SMILES', ~'SMILES') %>% rowid_to_column(("Data.ID.No"))
 
-#soil parameters 
+#Soil parameters 
 newSoil<-Fings2 %>% 
-  mutate(StudyT = 4, logfoc = 0.551449998, logDose =2.301029996, logTdose =  0.602059991, Dispersant = "No") %>% 
-  rename_at('M_SMILES', ~'Smiles')%>% rowid_to_column(("Data.ID.No"))
+  mutate(StudyT = 20, logfoc = 1.0413926865, logDose = 2, logTdose = 4.301029996, Dispersant = "No") %>% 
+  rename_at('M_SMILES', ~'SMILES')%>% rowid_to_column(("Data.ID.No"))
 
 # SW parameters 
 Fings3xSW<- Fings3 %>% 
@@ -85,56 +86,52 @@ Fings3xFW<- Fings3 %>%
   mutate(Viscosity = 1.023, C_disp = 0, Concentration = 0.1, Temperature = 21, FW = 1, SW = 0, AS = 0) %>%
   rename_at('M_SMILES', ~'Smiles') %>% rowid_to_column(("ChemID"))
 
-# Sediment module -----------------------------------------------------
-sedimentD<-read.csv(file.choose(), fileEncoding="latin1")
+#4 Sediment module -----------------------------------------------------
+sedimentD<-read.csv(file.choose()) #add training dataset 
 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(sedimentD$Data.ID.No)){
-  if (sedimentD[i,36]==1) {sedimentD[i,28:35]=0}
-  if (sedimentD[i,35]==1) {sedimentD[i,28:34]=0}
-  if (sedimentD[i,34]==1) {sedimentD[i,28:33]=0}
-  if (sedimentD[i,33]==1) {sedimentD[i,28:32]=0}
-  if (sedimentD[i,32]==1) {sedimentD[i,28:31]=0}
-  if (sedimentD[i,31]==1) {sedimentD[i,28:30]=0}
-  if (sedimentD[i,30]==1) {sedimentD[i,28:29]=0}
-  if (sedimentD[i,29]==1) {sedimentD[i,28]=0}
+  if (sedimentD[i,38]==1) {sedimentD[i,30:47]=0}
+  if (sedimentD[i,37]==1) {sedimentD[i,30:46]=0}
+  if (sedimentD[i,36]==1) {sedimentD[i,30:35]=0}
+  if (sedimentD[i,35]==1) {sedimentD[i,30:34]=0}
+  if (sedimentD[i,34]==1) {sedimentD[i,30:33]=0}
+  if (sedimentD[i,33]==1) {sedimentD[i,30:32]=0}
+  if (sedimentD[i,32]==1) {sedimentD[i,30:31]=0}
+  if (sedimentD[i,31]==1) {sedimentD[i,30]=0}
 }
 
 #Setting same random seed as the pp-LFER models to ensure comparison
 set.seed(34353638)
 smp_sz = floor(0.80*length(sedimentD$Data.ID.No))
-train_ind = sample(x = seq(1,length(sedimentD$Data.ID.No),1), size = smp_sz)
+train_indSed = sample(x = seq(1,length(sedimentD$Data.ID.No),1), size = smp_sz)
 
-train = sedimentD[train_ind,]
-test = sedimentD[-train_ind,]
+trainSed = sedimentD[train_indSed,]
 
 #Incorporating the chemical fingerprints and system parameters together
-m4 = cubist(x = train[,c(10, 11, 12, 13, 15,16, seq(17, 84,1))], y=train$log.DT50.)
-P3 = predict(m4, test)
-all_P4 = predict(m4, sedimentD)
-train_P4 = predict(m4, train)
+m3_8Sed = cubist(x = trainSed[,c(13, 17,21, seq(24, 82,1))], y=trainSed$logDT50) #Temp + Dose + WS
 
 #arrange data 
-newSed<-rbind.fill(sedimentD, newSed) #this merges table with default values  
-newSed<-newSed[1033:nrow(newSed),]
+newSed<-rbind.fill(sedimentD, newSed) #this merges table with default values for FW 
+newSed<-newSed[1234:nrow(newSed),]
 
 #Make new prediction 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(newSed$Data.ID.No)){
-  if (newSed[i,36]==1) {newSed[i,28:35]=0}
-  if (newSed[i,35]==1) {newSed[i,28:34]=0}
-  if (newSed[i,34]==1) {newSed[i,28:33]=0}
-  if (newSed[i,33]==1) {newSed[i,28:32]=0}
-  if (newSed[i,32]==1) {newSed[i,28:31]=0}
-  if (newSed[i,31]==1) {newSed[i,28:30]=0}
-  if (newSed[i,30]==1) {newSed[i,28:29]=0}
-  if (newSed[i,29]==1) {newSed[i,28]=0}
+  if (newSed[i,38]==1) {newSed[i,30:47]=0}
+  if (newSed[i,37]==1) {newSed[i,30:46]=0}
+  if (newSed[i,36]==1) {newSed[i,30:35]=0}
+  if (newSed[i,35]==1) {newSed[i,30:34]=0}
+  if (newSed[i,34]==1) {newSed[i,30:33]=0}
+  if (newSed[i,33]==1) {newSed[i,30:32]=0}
+  if (newSed[i,32]==1) {newSed[i,30:31]=0}
+  if (newSed[i,31]==1) {newSed[i,30]=0}
 }
 
-SedResults<-data.frame(LogDT50_Sediment = signif(predict(m4, newSed), 7))  
+SedResults<-data.frame(LogDT50_Sediment = signif(predict(m3_8Sed, newSed), 7))  
 
-# Soil module -------------------------------------------------------------
-soilD = read.csv(file.choose(), fileEncoding="latin1")
+#5 Soil module -------------------------------------------------------------
+soilD <-read.csv(file.choose()) #add training dataset 
 
 #Trimming redundant n-alkyl fragments C3 - C18
 for (i in 1:length(soilD$Data.ID.No)){
@@ -148,23 +145,24 @@ for (i in 1:length(soilD$Data.ID.No)){
   if (soilD[i,24]==1) {soilD[i,23]=0}
 }
 
+#Trimming higher order DAHs and PAHs
+for (i in 1:length(soilD$Data.ID.No)){
+  if (sum(soilD[i,44:53])>=1) {soilD[i,42]=0}
+}
+
 #Setting same random seed as the pp-LFER models to ensure comparison
 set.seed(34353638)
 smp_sz = floor(0.80*length(soilD$Data.ID.No))
-train_ind = sample(x = seq(1,length(soilD$Data.ID.No),1), size = smp_sz)
+train_indSoil = sample(x = seq(1,length(soilD$Data.ID.No),1), size = smp_sz)
 
-train = soilD[train_ind,]
-test = soilD[-train_ind,]
+trainSoil = soilD[train_indSoil,]
 
 #Incorporating the chemical fingerprints and system parameters together
-m3 = cubist(x = train[,c(9, 10, 11, 13, seq(14, 62,1))], y=train$logDT50)
-P3 = predict(m3, test)
-all_P3 = predict(m3, soilD)
-train_P3 = predict(m3, train)
+m3_7Soil = cubist(x = trainSoil[,c(9, 10, 13, seq(14, 60,1))], y=trainSoil$logDT50)
 
 #To make a new prediction 
 #arrange data 
-newSoil<-rbind.fill(soilD, newSoil) #this merges table with default values 
+newSoil<-rbind.fill(soilD, newSoil) #this merges table with default values for FW 
 newSoil<-newSoil[838:nrow(newSoil),]
 
 #Trimming redundant n-alkyl fragments C3 - C18
@@ -179,11 +177,12 @@ for (i in 1:length(newSoil$Data.ID.No)){
   if (newSoil[i,24]==1) {newSoil[i,23]=0}
 }
 
-SoilResults<-data.frame(LogDT50_Soil = signif(predict(m3, newSoil), 7))  
+SoilResults<-data.frame(LogDT50_Soil = signif(predict(m3_7Soil, newSoil), 7))  
 
-# Water module ----------------------------------------------
-#Load trainset SW & FW
-Waterdc = read.csv(file.choose(), fileEncoding="latin1")
+#6 Fresh Water module ----------------------------------------------
+#Load trainset SW'n'FW
+
+Waterdc<-read.csv(file.choose()) #add training dataset 
 
 #Set identical seed to previous models and split dataset for training and validation
 set.seed(34353637)
@@ -224,15 +223,9 @@ for (i in 1:length(Waterdc$ChemID)){
 
 #Define training and test sets
 train2c = Waterdc[train_ind2c,]
-test2c = Waterdc[-train_ind2c,]
 
 #Run cubist() model
 m3d2 = cubist(x = train2c[,c(13,14,15,16,19,20,21, seq(37, length(names(train2c))))], y=train2c$log_HL_obs)
-
-#Predict DT50s for training, test, and complete datasets, write to CSV
-P3train = predict(m3d2, train2c)
-P3test = predict(m3d2, test2c)
-P3all = predict(m3d2, Waterdc)
 
 ###To make a new prediction
 
@@ -274,7 +267,7 @@ for (i in 1:length(newFW$ChemID)){
 
 FWResults<-data.frame(LogDT50_Freshwater = signif(predict(m3d2, newFW), 7)) #Predicted log(DT50). 
 
-# Seawater module ---------------------------------------------------------
+#7 Seawater module ---------------------------------------------------------
 ###To make a new prediction
 
 newSW<-rbind.fill(Waterdc, Fings3xSW)
@@ -313,5 +306,19 @@ for (i in 1:length(newSW$ChemID)){
 }
 
 SWResults<-data.frame(LogDT50_Seawater = signif(predict(m3d2, newSW), 7))
+# add function to turn data into DT50 before getting the .csv file 
+
+SWResults<-SWResults %>%
+  mutate(DT50_Seawater = 10^(LogDT50_Seawater))
+
+FWResults<-FWResults%>%
+  mutate(DT50_Freshwater = 10^(LogDT50_Freshwater))
+
+SoilResults<-SoilResults %>% 
+  mutate(DT50_Soil= 10^(LogDT50_Soil))
+
+SedResults<-SedResults %>% 
+  mutate(DT50_Sediment= 10^(LogDT50_Sediment))
+
 
 write.csv(All_DT50<-data.frame(FWResults, SWResults, SoilResults, SedResults), file = "Predictions_DT50.csv")
