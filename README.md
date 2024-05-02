@@ -2,11 +2,14 @@
 
 This model predicts primary biodegradation (DT50) using a supervised model tree machine-learning model. 
 
-Further details of this model can be found in the Open access paper: 
+Further details of these models can be found in the Open access papers: 
 
 _"Predicting Primary Biodegradation of Petroleum Hydrocarbons in Aquatic Systems: Integrating System and Molecular Structure Parameters using a Novel Machine-Learning Framework"_
+_"Predicting Hydrocarbon Primary Biodegradation in Soil and Sediment Systems Using System Parameterization and Machine Learning"_
+
 
 **Available in: https://setac.onlinelibrary.wiley.com/doi/10.1002/etc.5328**
+**Available in: https://setac.onlinelibrary.wiley.com/doi/10.1002/etc.5857**
 
 The scripts require the installation of R and RStudio with the next libraries:
 
